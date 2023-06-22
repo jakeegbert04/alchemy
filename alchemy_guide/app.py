@@ -158,10 +158,17 @@ def user_delete(id):
 
     user = Users.query.get(id)
 
-    db.session.delete(user)
-    db.session.commit()
+    if not user:
+        return jsonify('User not found'), 404
 
-    return jsonify("User deleted"), 200
+    try:
+        db.session.delete(user)
+        db.session.commit()
+        return jsonify('User deleted'), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(f'Error deleting user: {str(e)}'), 500
+
 
 
 
